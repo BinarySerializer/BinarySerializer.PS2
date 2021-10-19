@@ -4,26 +4,34 @@ namespace BinarySerializer.PS2
     {
         public override GSRegisters RegisterByte => GSRegisters.TRXPOS;
 
-        public int SSAX { get; set; }
-        public int SSAY { get; set; }
-        public int DSAX { get; set; }
-        public int DSAY { get; set; }
-        public int DIR { get; set; }
+        public ushort SSAX { get; set; }
+        public ushort SSAY { get; set; }
+        public ushort DSAX { get; set; }
+        public ushort DSAY { get; set; }
+        public TransmissionOrder DIR { get; set; }
 
         public override void SerializeImpl(SerializerObject s)
         {
-            s.SerializeBitValues<ushort>(bitFunc =>
+            s.SerializeBitValues64<ulong>(bitFunc =>
             {
-                SSAX = bitFunc(SSAX, 11, name: nameof(SSAX));
+                SSAX = (ushort)bitFunc(SSAX, 11, name: nameof(SSAX));
                 bitFunc(default, 4, name: "Padding");
-                SSAY = bitFunc(SSAY, 11, name: nameof(SSAY));
+                SSAY = (ushort)bitFunc(SSAY, 11, name: nameof(SSAY));
                 bitFunc(default, 4, name: "Padding");
-                DSAX = bitFunc(DSAX, 11, name: nameof(DSAX));
+                DSAX = (ushort)bitFunc(DSAX, 11, name: nameof(DSAX));
                 bitFunc(default, 4, name: "Padding");
-                DSAY = bitFunc(DSAY, 11, name: nameof(DSAY));
-                DIR = bitFunc(DIR, 2, name: nameof(DIR));
+                DSAY = (ushort)bitFunc(DSAY, 11, name: nameof(DSAY));
+                DIR = (TransmissionOrder)bitFunc((int)DIR, 2, name: nameof(DIR));
                 bitFunc(default, 2, name: "Padding");
             });
+        }
+
+        public enum TransmissionOrder
+        {
+            UpperLeft_LowerRight,
+            LowerLeft_UpperRight,
+            UpperRight_LowerLeft,
+            LowerRight_UpperLeft
         }
     }
 }

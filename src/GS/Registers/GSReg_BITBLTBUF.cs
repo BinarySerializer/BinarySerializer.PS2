@@ -4,26 +4,26 @@ namespace BinarySerializer.PS2
     {
         public override GSRegisters RegisterByte => GSRegisters.BITBLTBUF;
 
-        public int SBP { get; set; }
-        public int SBW { get; set; }
+        public ushort SBP { get; set; }
+        public ushort SBW { get; set; }
         public GS.PixelStorageFormat SPSM { get; set; }
-        public int DBP { get; set; }
-        public int DBW { get; set; }
+        public ushort DBP { get; set; }
+        public ushort DBW { get; set; }
         public GS.PixelStorageFormat DPSM { get; set; }
 
         public override void SerializeImpl(SerializerObject s)
         {
-            s.SerializeBitValues<ushort>(bitFunc =>
+            s.SerializeBitValues64<ulong>(bitFunc =>
             {
-                SBP = bitFunc(SBP, 14, name: nameof(SBP));
+                SBP = (ushort)bitFunc(SBP, 14, name: nameof(SBP));
                 bitFunc(default, 2, name: "Padding");
-                SBW = bitFunc(SBW, 6, name: nameof(SBW));
+                SBW = (ushort)bitFunc(SBW, 6, name: nameof(SBW));
                 bitFunc(default, 2, name: "Padding");
                 SPSM = (GS.PixelStorageFormat)bitFunc((int)SPSM, 6, name: nameof(SPSM));
                 bitFunc(default, 2, name: "Padding");
-                DBP = bitFunc(DBP, 14, name: nameof(DBP));
+                DBP = (ushort)bitFunc(DBP, 14, name: nameof(DBP));
                 bitFunc(default, 2, name: "Padding");
-                DBW = bitFunc(DBW, 6, name: nameof(DBW));
+                DBW = (ushort)bitFunc(DBW, 6, name: nameof(DBW));
                 bitFunc(default, 2, name: "Padding");
                 DPSM = (GS.PixelStorageFormat)bitFunc((int)DPSM, 6, name: nameof(DPSM));
                 bitFunc(default, 2, name: "Padding");

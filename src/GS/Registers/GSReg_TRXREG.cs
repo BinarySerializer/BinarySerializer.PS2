@@ -4,16 +4,16 @@ namespace BinarySerializer.PS2
     {
         public override GSRegisters RegisterByte => GSRegisters.TRXREG;
 
-        public int RRW { get; set; }
-        public int RRH { get; set; }
+        public ushort RRW { get; set; }
+        public ushort RRH { get; set; }
 
         public override void SerializeImpl(SerializerObject s)
         {
-            s.SerializeBitValues<ushort>(bitFunc =>
+            s.SerializeBitValues64<ulong>(bitFunc =>
             {
-                RRW = bitFunc(RRW, 12, name: nameof(RRW));
+                RRW = (ushort)bitFunc(RRW, 12, name: nameof(RRW));
                 bitFunc(default, 20, name: "Padding");
-                RRH = bitFunc(RRH, 12, name: nameof(RRH));
+                RRH = (ushort)bitFunc(RRH, 12, name: nameof(RRH));
                 bitFunc(default, 20, name: "Padding");
             });
         }
