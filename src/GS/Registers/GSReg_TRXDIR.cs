@@ -1,6 +1,6 @@
 namespace BinarySerializer.PS2
 {
-    class GSReg_TRXDIR : BinarySerializable
+    public class GSReg_TRXDIR : BinarySerializable
     {
         public int XDIR { get; set; }
 

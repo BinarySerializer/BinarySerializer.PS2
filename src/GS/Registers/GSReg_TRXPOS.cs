@@ -1,6 +1,6 @@
 namespace BinarySerializer.PS2
 {
-    class GSReg_TRXPOS : BinarySerializable
+    public class GSReg_TRXPOS : BinarySerializable
     {
         public int SSAX { get; set; }
         public int SSAY { get; set; }

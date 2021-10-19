@@ -1,6 +1,6 @@
 namespace BinarySerializer.PS2
 {
-    class GSReg_BITBLTBUF : BinarySerializable
+    public class GSReg_BITBLTBUF : BinarySerializable
     {
         public int SBP { get; set; }
         public int SBW { get; set; }
