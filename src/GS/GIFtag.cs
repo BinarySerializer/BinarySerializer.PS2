@@ -1,5 +1,6 @@
 namespace BinarySerializer.PS2
 {
+    /// <see href="https://psi-rockin.github.io/ps2tek/#giftags">GIFtag documentation</see>
     public class GIFtag : BinarySerializable
     {
         public ushort NLOOP { get; set; }

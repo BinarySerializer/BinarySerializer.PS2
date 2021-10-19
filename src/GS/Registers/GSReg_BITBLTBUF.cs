@@ -6,10 +6,10 @@ namespace BinarySerializer.PS2
 
         public ushort SBP { get; set; }
         public ushort SBW { get; set; }
-        public GS.PixelStorageFormat SPSM { get; set; }
+        public GS.PixelStorageMode SPSM { get; set; }
         public ushort DBP { get; set; }
         public ushort DBW { get; set; }
-        public GS.PixelStorageFormat DPSM { get; set; }
+        public GS.PixelStorageMode DPSM { get; set; }
 
         public override void SerializeImpl(SerializerObject s)
         {
@@ -19,13 +19,13 @@ namespace BinarySerializer.PS2
                 bitFunc(default, 2, name: "Padding");
                 SBW = (ushort)bitFunc(SBW, 6, name: nameof(SBW));
                 bitFunc(default, 2, name: "Padding");
-                SPSM = (GS.PixelStorageFormat)bitFunc((int)SPSM, 6, name: nameof(SPSM));
+                SPSM = (GS.PixelStorageMode)bitFunc((int)SPSM, 6, name: nameof(SPSM));
                 bitFunc(default, 2, name: "Padding");
                 DBP = (ushort)bitFunc(DBP, 14, name: nameof(DBP));
                 bitFunc(default, 2, name: "Padding");
                 DBW = (ushort)bitFunc(DBW, 6, name: nameof(DBW));
                 bitFunc(default, 2, name: "Padding");
-                DPSM = (GS.PixelStorageFormat)bitFunc((int)DPSM, 6, name: nameof(DPSM));
+                DPSM = (GS.PixelStorageMode)bitFunc((int)DPSM, 6, name: nameof(DPSM));
                 bitFunc(default, 2, name: "Padding");
             });
         }

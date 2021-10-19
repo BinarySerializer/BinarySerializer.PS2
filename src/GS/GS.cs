@@ -17,7 +17,8 @@ namespace BinarySerializer.PS2
             // TODO: Add functions for writing and reading image data
         }
 
-        public enum PixelStorageFormat
+        /// <see href="https://openkh.dev/common/tm2.html#psm-register-pixel-storage-mode">PSM documentation</see>
+        public enum PixelStorageMode
         {
             PSMCT32 = 0x00,
             PSMCT24 = 0x01,

@@ -1,5 +1,6 @@
 namespace BinarySerializer.PS2
 {
+    /// <see href="https://psi-rockin.github.io/ps2tek/#dmacchainmode">DMAtag documentation</see>
     public class Chain_DMAtag : BinarySerializable
     {
         public ushort QWC { get; set; }

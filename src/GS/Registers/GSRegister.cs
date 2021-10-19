@@ -1,11 +1,19 @@
 namespace BinarySerializer.PS2
 {
+    /// <see href="https://psi-rockin.github.io/ps2tek/#gsregisterlist">GS register list</see>
     public abstract class GSRegister : BinarySerializable
     {
         /// <summary>
         /// Byte identifier of the register
         /// </summary>
         public abstract GSRegisters RegisterByte { get; }
+
+        /// <summary>
+        /// Whether or not to serialize the identifier after the register data bytes (8 bytes)
+        /// Used for games that store textures in raw GS transfer data, such as Klonoa 2: Lunatea's Veil and Kingdom Hearts 2
+        /// TODO: Implement this
+        /// </summary>
+        public virtual bool SerializeTag => false;
     }
 
     public enum GSRegisters : byte
