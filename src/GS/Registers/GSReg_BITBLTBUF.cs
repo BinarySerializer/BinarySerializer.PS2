@@ -1,7 +1,9 @@
 namespace BinarySerializer.PS2
 {
-    public class GSReg_BITBLTBUF : BinarySerializable
+    public class GSReg_BITBLTBUF : GSRegister
     {
+        public override byte RegisterByte => 0x50;
+
         public int SBP { get; set; }
         public int SBW { get; set; }
         public int SPSM { get; set; }

@@ -1,7 +1,9 @@
 namespace BinarySerializer.PS2
 {
-    public class GSReg_TRXDIR : BinarySerializable
+    public class GSReg_TRXDIR : GSRegister
     {
+        public override byte RegisterByte => 0x53;
+
         public int XDIR { get; set; }
 
         public override void SerializeImpl(SerializerObject s)

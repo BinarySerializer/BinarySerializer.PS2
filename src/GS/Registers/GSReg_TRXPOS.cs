@@ -1,7 +1,9 @@
 namespace BinarySerializer.PS2
 {
-    public class GSReg_TRXPOS : BinarySerializable
+    public class GSReg_TRXPOS : GSRegister
     {
+        public override byte RegisterByte => 0x51;
+
         public int SSAX { get; set; }
         public int SSAY { get; set; }
         public int DSAX { get; set; }
