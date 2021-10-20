@@ -34,5 +34,14 @@ namespace BinarySerializer.PS2
             PSMZ16 = 0x32,
             PSMZ16S = 0x3A
         }
+
+        /// <see href="https://openkh.dev/common/tm2.html#cpsm-register-color-look-up-pixel-storage-mode">CPSM documentation</see>
+        public enum CLUTPixelStorageMode
+        {
+            PSMCT32 = 0x00,
+            PSMCT24 = 0x01,
+            PSMCT16 = 0x02,
+            PSMCT16S = 0x03
+        }
     }
 }
