@@ -19,7 +19,7 @@ namespace BinarySerializer.PS2
                 EOP = (byte)bitFunc(EOP, 1, name: nameof(EOP));
                 bitFunc(default, 30, name: "Padding");
                 PRE = (byte)bitFunc(PRE, 1, name: nameof(PRE));
-                PRIM = (byte)bitFunc(PRIM, 11, name: nameof(PRIM));
+                PRIM = (ushort)bitFunc(PRIM, 11, name: nameof(PRIM));
                 FLG = (DataFormat)bitFunc((int)FLG, 2, name: nameof(FLG));
                 NREG = (byte)bitFunc(NREG, 4, name: nameof(NREG));
             });
