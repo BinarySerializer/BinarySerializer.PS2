@@ -43,5 +43,21 @@ namespace BinarySerializer.PS2
             PSMCT16 = 0x02,
             PSMCT16S = 0x03
         }
+
+        /// <see href="https://openkh.dev/common/tm2.html#csm-register-color-storage-mode">CSM documentation</see>
+        public enum ColorStorageMode
+        {
+            CSM1 = 0x00,
+            CSM2 = 0x01
+        }
+
+        /// <see href="https://openkh.dev/common/tm2.html#tfx-register-texture-function">TFX documentation</see>
+        public enum TextureFunction
+        {
+            MODULATE = 0x00,
+            DECAL = 0x01,
+            HIGHLIGHT = 0x02,
+            HIGHLIGHT2 = 0x03
+        }
     }
 }
