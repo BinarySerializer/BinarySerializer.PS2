@@ -11,7 +11,7 @@ namespace BinarySerializer.PS2
         public ushort DBW { get; set; }
         public GS.PixelStorageMode DPSM { get; set; }
 
-        public override void SerializeImpl(SerializerObject s)
+        public override void SerializeRegisterImpl(SerializerObject s)
         {
             s.SerializeBitValues64<ulong>(bitFunc =>
             {

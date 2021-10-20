@@ -6,7 +6,7 @@ namespace BinarySerializer.PS2
 
         public TransmissionDirection XDIR { get; set; }
 
-        public override void SerializeImpl(SerializerObject s)
+        public override void SerializeRegisterImpl(SerializerObject s)
         {
             s.SerializeBitValues64<ulong>(bitFunc =>
             {

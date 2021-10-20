@@ -7,7 +7,7 @@ namespace BinarySerializer.PS2
         public ushort RRW { get; set; }
         public ushort RRH { get; set; }
 
-        public override void SerializeImpl(SerializerObject s)
+        public override void SerializeRegisterImpl(SerializerObject s)
         {
             s.SerializeBitValues64<ulong>(bitFunc =>
             {

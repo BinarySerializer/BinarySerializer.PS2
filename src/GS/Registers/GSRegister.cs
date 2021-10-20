@@ -11,9 +11,26 @@ namespace BinarySerializer.PS2
         /// <summary>
         /// Whether or not to serialize the identifier after the register data bytes (8 bytes)
         /// Used for games that store textures in raw GS transfer data, such as Klonoa 2: Lunatea's Veil and Kingdom Hearts 2
-        /// TODO: Implement this
         /// </summary>
-        public virtual bool SerializeTag => false;
+        public bool SerializeTag { get; set; }
+
+        public ulong RegisterTag { get; set; }
+
+        public override void SerializeImpl(SerializerObject s)
+        {
+            SerializeRegisterImpl(s);
+            if (SerializeTag)
+                SerializeRegisterTag(s);
+        }
+
+        public abstract void SerializeRegisterImpl(SerializerObject s);
+
+        protected void SerializeRegisterTag(SerializerObject s)
+        {
+            RegisterTag = s.Serialize<ulong>(RegisterTag, name: nameof(RegisterTag));
+            if (RegisterTag != (ulong)RegisterByte)
+                throw new BinarySerializableException(this, $"Invalid tag {RegisterTag} for register {RegisterByte}");
+        }
     }
 
     public enum GSRegisters : byte
