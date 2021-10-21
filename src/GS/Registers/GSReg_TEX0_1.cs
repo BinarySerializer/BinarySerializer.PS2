@@ -1,6 +1,6 @@
 namespace BinarySerializer.PS2
 {
-    public class GSReg_TEX0 : GSRegister
+    public class GSReg_TEX0_1 : GSRegister
     {
         public override GSRegisters RegisterByte => GSRegisters.TEX0_1;
 
