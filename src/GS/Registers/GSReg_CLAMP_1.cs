@@ -10,7 +10,7 @@ namespace BinarySerializer.PS2
         public int MAXU { get; set; }
         public int MINV { get; set; }
         public int MAXV { get; set; }
-        
+
         public override void SerializeRegisterImpl(SerializerObject s)
         {
             s.SerializeBitValues64<ulong>(bitFunc =>
@@ -21,7 +21,7 @@ namespace BinarySerializer.PS2
                 MAXU = (int)bitFunc(MAXU, 10, name: nameof(MAXU));
                 MINV = (int)bitFunc(MINV, 10, name: nameof(MINV));
                 MAXV = (int)bitFunc(MAXV, 10, name: nameof(MAXV));
-                s.SerializePadding(20);
+                bitFunc(default, 20, name: "Padding");
             });
         }
     }
