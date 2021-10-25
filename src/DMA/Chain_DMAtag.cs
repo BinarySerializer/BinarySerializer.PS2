@@ -35,5 +35,9 @@ namespace BinarySerializer.PS2
             RET,
             END
         }
+
+        public override string ToString() => $"DMATag(TagID: {ID}, QWC: {QWC}, ADDR: {ADDR:X8}, SPR: {SPR}, PCE: {PCE}, IRQ: {IRQ})";
+        public override string ShortLog => ToString();
+        public override bool IsShortLog => true;
     }
 }

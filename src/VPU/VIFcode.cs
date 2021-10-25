@@ -19,6 +19,8 @@ namespace BinarySerializer.PS2
             });
         }
 
-
-    }
+        public override string ToString() => $"VIFCode(CMD: {CMD:X2}, NUM: {NUM}, IMMEDIATE: {IMMEDIATE}, STALL: {Stall})";
+        public override string ShortLog => ToString();
+		public override bool IsShortLog => true;
+	}
 }
