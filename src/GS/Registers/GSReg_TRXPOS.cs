@@ -15,14 +15,14 @@ namespace BinarySerializer.PS2
             s.SerializeBitValues64<ulong>(bitFunc =>
             {
                 SSAX = (ushort)bitFunc(SSAX, 11, name: nameof(SSAX));
-                bitFunc(default, 4, name: "Padding");
+                bitFunc(default, 5, name: "Padding");
                 SSAY = (ushort)bitFunc(SSAY, 11, name: nameof(SSAY));
-                bitFunc(default, 4, name: "Padding");
+                bitFunc(default, 5, name: "Padding");
                 DSAX = (ushort)bitFunc(DSAX, 11, name: nameof(DSAX));
-                bitFunc(default, 4, name: "Padding");
+                bitFunc(default, 5, name: "Padding");
                 DSAY = (ushort)bitFunc(DSAY, 11, name: nameof(DSAY));
                 DIR = (TransmissionOrder)bitFunc((int)DIR, 2, name: nameof(DIR));
-                bitFunc(default, 2, name: "Padding");
+                bitFunc(default, 3, name: "Padding");
             });
         }
 
