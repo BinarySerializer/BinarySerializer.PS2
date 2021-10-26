@@ -9,7 +9,7 @@ namespace BinarySerializer.PS2
         public ushort PRIM { get; set; }
         public DataFormat FLG { get; set; }
         public byte NREG { get; set; }
-        public ulong REGS { get; set; }
+        public Register[] REGS { get; set; }
 
         public override void SerializeImpl(SerializerObject s)
         {
@@ -23,7 +23,18 @@ namespace BinarySerializer.PS2
                 FLG = (DataFormat)bitFunc((int)FLG, 2, name: nameof(FLG));
                 NREG = (byte)bitFunc(NREG, 4, name: nameof(NREG));
             });
-            REGS = s.Serialize<ulong>(REGS, name: nameof(REGS)); // TODO: Parse this properly (4 bits per register field)
+            s.SerializeBitValues64<ulong>(bitFunc =>
+            {
+                if (NREG != 0)
+                {
+                    REGS = new Register[NREG];
+                    for (int i = 0; i < NREG; i++)
+                        REGS[i] = (Register)bitFunc((int)REGS[i], 4, name: $"{nameof(REGS)}[{i}]");
+                }
+                
+                if (64 - NREG * 4 != 0)
+                    bitFunc(default, 64 - NREG * 4, name: "Padding");
+            });
         }
 
         public enum DataFormat
@@ -32,6 +43,26 @@ namespace BinarySerializer.PS2
             REGLIST,
             IMAGE,
             DISABLE
+        }
+
+        public enum Register
+        {
+            PRIM,
+            RGBAQ,
+            ST,
+            UV,
+            XYZF2,
+            XYZ2,
+            TEX0_1,
+            TEX0_2,
+            CLAMP_1,
+            CLAMP_2,
+            FOG,
+            RESERVED,
+            XYZF3,
+            XYZ3,
+            AD,
+            NOP
         }
     }
 }
