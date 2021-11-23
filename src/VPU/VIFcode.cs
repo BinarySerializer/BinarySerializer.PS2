@@ -10,12 +10,12 @@ namespace BinarySerializer.PS2
 
         public override void SerializeImpl(SerializerObject s)
         {
-            s.SerializeBitValues<int>(bitFunc =>
+            s.DoBits<int>(b =>
             {
-                IMMEDIATE = (uint)bitFunc((int)IMMEDIATE, 16, name: nameof(IMMEDIATE));
-                NUM = (uint)bitFunc((int)NUM, 8, name: nameof(NUM));
-                CMD = (uint)bitFunc((int)CMD, 7, name: nameof(CMD));
-                Stall = bitFunc(Stall ? 1 : 0, 1, name: nameof(Stall)) == 1;
+                IMMEDIATE = (uint)b.SerializeBits<int>((int)IMMEDIATE, 16, name: nameof(IMMEDIATE));
+                NUM = (uint)b.SerializeBits<int>((int)NUM, 8, name: nameof(NUM));
+                CMD = (uint)b.SerializeBits<int>((int)CMD, 7, name: nameof(CMD));
+                Stall = b.SerializeBits<int>(Stall ? 1 : 0, 1, name: nameof(Stall)) == 1;
             });
         }
 

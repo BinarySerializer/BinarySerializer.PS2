@@ -12,19 +12,19 @@ namespace BinarySerializer.PS2
 
         public override void SerializeImpl(SerializerObject s)
         {
-            s.SerializeBitValues64<ulong>(bitFunc =>
+            s.DoBits<ulong>(b =>
             {
-                QWC = (ushort)bitFunc(QWC, 16, name: nameof(QWC));
-                bitFunc(default, 10, name: "Padding");
-                PCE = (byte)bitFunc(PCE, 2, name: nameof(PCE));
-                ID = (TagID)bitFunc((int)ID, 3, name: nameof(ID));
-                IRQ = (byte)bitFunc(IRQ, 1, name: nameof(IRQ));
-                ADDR = (uint)bitFunc(ADDR, 31, name: nameof(ADDR));
-                SPR = (byte)bitFunc(SPR, 1, name: nameof(SPR));
+                QWC = b.SerializeBits<ushort>(QWC, 16, name: nameof(QWC));
+                b.SerializeBits<int>(default, 10, name: "Padding");
+                PCE = b.SerializeBits<byte>(PCE, 2, name: nameof(PCE));
+                ID = b.SerializeBits<TagID>(ID, 3, name: nameof(ID));
+                IRQ = b.SerializeBits<byte>(IRQ, 1, name: nameof(IRQ));
+                ADDR = b.SerializeBits<uint>(ADDR, 31, name: nameof(ADDR));
+                SPR = b.SerializeBits<byte>(SPR, 1, name: nameof(SPR));
             });
         }
 
-        public enum TagID
+        public enum TagID : int
         {
             REFE_CNTS, // refe for source chain tag, cnts for destination chain tag
             CNT,

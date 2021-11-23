@@ -8,10 +8,10 @@ namespace BinarySerializer.PS2
 
         public override void SerializeRegisterImpl(SerializerObject s)
         {
-            s.SerializeBitValues64<ulong>(bitFunc =>
+            s.DoBits<ulong>(b =>
             {
-                XDIR = (TransmissionDirection)bitFunc((int)XDIR, 11, name: nameof(XDIR));
-                bitFunc(default, 53, name: "Padding");
+                XDIR = (TransmissionDirection)b.SerializeBits<int>((int)XDIR, 11, name: nameof(XDIR));
+                b.SerializeBits<long>(default, 53, name: "Padding");
             });
         }
 

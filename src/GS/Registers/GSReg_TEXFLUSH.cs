@@ -6,9 +6,9 @@ namespace BinarySerializer.PS2
 
         public override void SerializeRegisterImpl(SerializerObject s)
         {
-            s.SerializeBitValues64<ulong>(bitFunc =>
+            s.DoBits<ulong>(b =>
             {
-                bitFunc(default, 64, name: "Padding");
+                b.SerializeBits<ulong>(default, 64, name: "Padding");
             });
         }
     }

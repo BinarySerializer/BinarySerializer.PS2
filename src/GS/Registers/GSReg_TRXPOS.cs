@@ -12,17 +12,17 @@ namespace BinarySerializer.PS2
 
         public override void SerializeRegisterImpl(SerializerObject s)
         {
-            s.SerializeBitValues64<ulong>(bitFunc =>
+            s.DoBits<ulong>(b =>
             {
-                SSAX = (ushort)bitFunc(SSAX, 11, name: nameof(SSAX));
-                bitFunc(default, 5, name: "Padding");
-                SSAY = (ushort)bitFunc(SSAY, 11, name: nameof(SSAY));
-                bitFunc(default, 5, name: "Padding");
-                DSAX = (ushort)bitFunc(DSAX, 11, name: nameof(DSAX));
-                bitFunc(default, 5, name: "Padding");
-                DSAY = (ushort)bitFunc(DSAY, 11, name: nameof(DSAY));
-                DIR = (TransmissionOrder)bitFunc((int)DIR, 2, name: nameof(DIR));
-                bitFunc(default, 3, name: "Padding");
+                SSAX = (ushort)b.SerializeBits<int>(SSAX, 11, name: nameof(SSAX));
+                b.SerializeBits<int>(default, 5, name: "Padding");
+                SSAY = (ushort)b.SerializeBits<int>(SSAY, 11, name: nameof(SSAY));
+                b.SerializeBits<int>(default, 5, name: "Padding");
+                DSAX = (ushort)b.SerializeBits<int>(DSAX, 11, name: nameof(DSAX));
+                b.SerializeBits<int>(default, 5, name: "Padding");
+                DSAY = (ushort)b.SerializeBits<int>(DSAY, 11, name: nameof(DSAY));
+                DIR = (TransmissionOrder)b.SerializeBits<int>((int)DIR, 2, name: nameof(DIR));
+                b.SerializeBits<int>(default, 3, name: "Padding");
             });
         }
 

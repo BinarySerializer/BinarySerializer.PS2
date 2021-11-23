@@ -9,12 +9,12 @@ namespace BinarySerializer.PS2
 
         public override void SerializeRegisterImpl(SerializerObject s)
         {
-            s.SerializeBitValues64<ulong>(bitFunc =>
+            s.DoBits<ulong>(b =>
             {
-                RRW = (ushort)bitFunc(RRW, 12, name: nameof(RRW));
-                bitFunc(default, 20, name: "Padding");
-                RRH = (ushort)bitFunc(RRH, 12, name: nameof(RRH));
-                bitFunc(default, 20, name: "Padding");
+                RRW = (ushort)b.SerializeBits<int>(RRW, 12, name: nameof(RRW));
+                b.SerializeBits<int>(default, 20, name: "Padding");
+                RRH = (ushort)b.SerializeBits<int>(RRH, 12, name: nameof(RRH));
+                b.SerializeBits<int>(default, 20, name: "Padding");
             });
         }
     }

@@ -13,27 +13,27 @@ namespace BinarySerializer.PS2
 
         public override void SerializeImpl(SerializerObject s)
         {
-            s.SerializeBitValues64<ulong>(bitFunc =>
+            s.DoBits<ulong>(b =>
             {
-                NLOOP = (ushort)bitFunc(NLOOP, 15, name: nameof(NLOOP));
-                EOP = (byte)bitFunc(EOP, 1, name: nameof(EOP));
-                bitFunc(default, 30, name: "Padding");
-                PRE = (byte)bitFunc(PRE, 1, name: nameof(PRE));
-                PRIM = (ushort)bitFunc(PRIM, 11, name: nameof(PRIM));
-                FLG = (DataFormat)bitFunc((int)FLG, 2, name: nameof(FLG));
-                NREG = (byte)bitFunc(NREG, 4, name: nameof(NREG));
+                NLOOP = (ushort)b.SerializeBits<int>(NLOOP, 15, name: nameof(NLOOP));
+                EOP = (byte)b.SerializeBits<int>(EOP, 1, name: nameof(EOP));
+                b.SerializeBits<int>(default, 30, name: "Padding");
+                PRE = (byte)b.SerializeBits<int>(PRE, 1, name: nameof(PRE));
+                PRIM = (ushort)b.SerializeBits<int>(PRIM, 11, name: nameof(PRIM));
+                FLG = (DataFormat)b.SerializeBits<int>((int)FLG, 2, name: nameof(FLG));
+                NREG = (byte)b.SerializeBits<int>(NREG, 4, name: nameof(NREG));
             });
-            s.SerializeBitValues64<ulong>(bitFunc =>
+            s.DoBits<ulong>(b =>
             {
                 if (NREG != 0)
                 {
                     REGS = new Register[NREG];
                     for (int i = 0; i < NREG; i++)
-                        REGS[i] = (Register)bitFunc((int)REGS[i], 4, name: $"{nameof(REGS)}[{i}]");
+                        REGS[i] = (Register)b.SerializeBits<int>((int)REGS[i], 4, name: $"{nameof(REGS)}[{i}]");
                 }
                 
                 if (64 - NREG * 4 != 0)
-                    bitFunc(default, 64 - NREG * 4, name: "Padding");
+                    b.SerializeBits<long>(default, 64 - NREG * 4, name: "Padding");
             });
         }
 

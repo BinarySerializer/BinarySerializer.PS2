@@ -19,20 +19,20 @@ namespace BinarySerializer.PS2
 
         public override void SerializeRegisterImpl(SerializerObject s)
         {
-            s.SerializeBitValues64<ulong>(bitFunc =>
+            s.DoBits<ulong>(b =>
             {
-                TPB0 = (ushort)bitFunc(TPB0, 14, name: nameof(TPB0));
-                TBW = (byte)bitFunc(TBW, 6, name: nameof(TBW));
-                PSM = (GS.PixelStorageMode)bitFunc((int)PSM, 6, name: nameof(PSM));
-                TW = (byte)bitFunc(TW, 4, name: nameof(TW));
-                TH = (byte)bitFunc(TH, 4, name: nameof(TH));
-                TCC = bitFunc(TCC ? 1 : 0, 1, name: nameof(TCC)) == 1;
-                TFX = (GS.TextureFunction)bitFunc((int)TFX, 2, name: nameof(TFX));
-                CBP = (ushort)bitFunc(CBP, 14, name: nameof(CBP));
-                CPSM = (GS.CLUTPixelStorageMode)bitFunc((int)CPSM, 4, name: nameof(CPSM));
-                CSM = (GS.ColorStorageMode)bitFunc((int)CSM, 1, name: nameof(CSM));
-                CSA = (byte)bitFunc(CSA, 5, name: nameof(CSA));
-                CLD = (byte)bitFunc(CLD, 3, name: nameof(CLD));
+                TPB0 = (ushort)b.SerializeBits<int>(TPB0, 14, name: nameof(TPB0));
+                TBW = (byte)b.SerializeBits<int>(TBW, 6, name: nameof(TBW));
+                PSM = (GS.PixelStorageMode)b.SerializeBits<int>((int)PSM, 6, name: nameof(PSM));
+                TW = (byte)b.SerializeBits<int>(TW, 4, name: nameof(TW));
+                TH = (byte)b.SerializeBits<int>(TH, 4, name: nameof(TH));
+                TCC = b.SerializeBits<int>(TCC ? 1 : 0, 1, name: nameof(TCC)) == 1;
+                TFX = (GS.TextureFunction)b.SerializeBits<int>((int)TFX, 2, name: nameof(TFX));
+                CBP = (ushort)b.SerializeBits<int>(CBP, 14, name: nameof(CBP));
+                CPSM = (GS.CLUTPixelStorageMode)b.SerializeBits<int>((int)CPSM, 4, name: nameof(CPSM));
+                CSM = (GS.ColorStorageMode)b.SerializeBits<int>((int)CSM, 1, name: nameof(CSM));
+                CSA = (byte)b.SerializeBits<int>(CSA, 5, name: nameof(CSA));
+                CLD = (byte)b.SerializeBits<int>(CLD, 3, name: nameof(CLD));
             });
         }
     }
