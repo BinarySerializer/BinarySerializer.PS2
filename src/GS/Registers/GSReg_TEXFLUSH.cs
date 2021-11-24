@@ -8,7 +8,7 @@ namespace BinarySerializer.PS2
         {
             s.DoBits<ulong>(b =>
             {
-                b.SerializeBits<ulong>(default, 64, name: "Padding");
+                b.SerializePadding(64);
             });
         }
     }

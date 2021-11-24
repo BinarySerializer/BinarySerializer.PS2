@@ -12,10 +12,10 @@ namespace BinarySerializer.PS2
         {
             s.DoBits<int>(b =>
             {
-                IMMEDIATE = (uint)b.SerializeBits<int>((int)IMMEDIATE, 16, name: nameof(IMMEDIATE));
-                NUM = (uint)b.SerializeBits<int>((int)NUM, 8, name: nameof(NUM));
-                CMD = (uint)b.SerializeBits<int>((int)CMD, 7, name: nameof(CMD));
-                Stall = b.SerializeBits<int>(Stall ? 1 : 0, 1, name: nameof(Stall)) == 1;
+                IMMEDIATE = b.SerializeBits<uint>(IMMEDIATE, 16, name: nameof(IMMEDIATE));
+                NUM = b.SerializeBits<uint>(NUM, 8, name: nameof(NUM));
+                CMD = b.SerializeBits<uint>(CMD, 7, name: nameof(CMD));
+                Stall = b.SerializeBits<bool>(Stall, 1, name: nameof(Stall));
             });
         }
 

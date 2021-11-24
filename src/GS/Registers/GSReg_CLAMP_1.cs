@@ -15,13 +15,13 @@ namespace BinarySerializer.PS2
         {
             s.DoBits<ulong>(b =>
             {
-                WMS = (WrapMode)b.SerializeBits<int>((int)WMS, 2, name: nameof(WMS));
-                WMT = (WrapMode)b.SerializeBits<int>((int)WMT, 2, name: nameof(WMT));
-                MINU = (int)b.SerializeBits<int>(MINU, 10, name: nameof(MINU));
-                MAXU = (int)b.SerializeBits<int>(MAXU, 10, name: nameof(MAXU));
-                MINV = (int)b.SerializeBits<int>(MINV, 10, name: nameof(MINV));
-                MAXV = (int)b.SerializeBits<int>(MAXV, 10, name: nameof(MAXV));
-                b.SerializeBits<int>(default, 20, name: "Padding");
+                WMS = b.SerializeBits<WrapMode>(WMS, 2, name: nameof(WMS));
+                WMT = b.SerializeBits<WrapMode>(WMT, 2, name: nameof(WMT));
+                MINU = b.SerializeBits<int>(MINU, 10, name: nameof(MINU));
+                MAXU = b.SerializeBits<int>(MAXU, 10, name: nameof(MAXU));
+                MINV = b.SerializeBits<int>(MINV, 10, name: nameof(MINV));
+                MAXV = b.SerializeBits<int>(MAXV, 10, name: nameof(MAXV));
+                b.SerializePadding(20);
             });
         }
     }

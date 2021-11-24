@@ -11,10 +11,10 @@ namespace BinarySerializer.PS2
         {
             s.DoBits<ulong>(b =>
             {
-                RRW = (ushort)b.SerializeBits<int>(RRW, 12, name: nameof(RRW));
-                b.SerializeBits<int>(default, 20, name: "Padding");
-                RRH = (ushort)b.SerializeBits<int>(RRH, 12, name: nameof(RRH));
-                b.SerializeBits<int>(default, 20, name: "Padding");
+                RRW = b.SerializeBits<ushort>(RRW, 12, name: nameof(RRW));
+                b.SerializePadding(20);
+                RRH = b.SerializeBits<ushort>(RRH, 12, name: nameof(RRH));
+                b.SerializePadding(20);
             });
         }
     }

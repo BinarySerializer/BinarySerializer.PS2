@@ -10,8 +10,8 @@ namespace BinarySerializer.PS2
         {
             s.DoBits<ulong>(b =>
             {
-                XDIR = (TransmissionDirection)b.SerializeBits<int>((int)XDIR, 11, name: nameof(XDIR));
-                b.SerializeBits<long>(default, 53, name: "Padding");
+                XDIR = b.SerializeBits<TransmissionDirection>(XDIR, 11, name: nameof(XDIR));
+                b.SerializePadding(53);
             });
         }
 

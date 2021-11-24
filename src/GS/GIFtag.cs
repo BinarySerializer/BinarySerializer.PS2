@@ -15,13 +15,13 @@ namespace BinarySerializer.PS2
         {
             s.DoBits<ulong>(b =>
             {
-                NLOOP = (ushort)b.SerializeBits<int>(NLOOP, 15, name: nameof(NLOOP));
-                EOP = (byte)b.SerializeBits<int>(EOP, 1, name: nameof(EOP));
-                b.SerializeBits<int>(default, 30, name: "Padding");
-                PRE = (byte)b.SerializeBits<int>(PRE, 1, name: nameof(PRE));
-                PRIM = (ushort)b.SerializeBits<int>(PRIM, 11, name: nameof(PRIM));
-                FLG = (DataFormat)b.SerializeBits<int>((int)FLG, 2, name: nameof(FLG));
-                NREG = (byte)b.SerializeBits<int>(NREG, 4, name: nameof(NREG));
+                NLOOP = b.SerializeBits<ushort>(NLOOP, 15, name: nameof(NLOOP));
+                EOP = b.SerializeBits<byte>(EOP, 1, name: nameof(EOP));
+                b.SerializePadding(30);
+                PRE = b.SerializeBits<byte>(PRE, 1, name: nameof(PRE));
+                PRIM = b.SerializeBits<ushort>(PRIM, 11, name: nameof(PRIM));
+                FLG = b.SerializeBits<DataFormat>(FLG, 2, name: nameof(FLG));
+                NREG = b.SerializeBits<byte>(NREG, 4, name: nameof(NREG));
             });
             s.DoBits<ulong>(b =>
             {
@@ -29,11 +29,11 @@ namespace BinarySerializer.PS2
                 {
                     REGS = new Register[NREG];
                     for (int i = 0; i < NREG; i++)
-                        REGS[i] = (Register)b.SerializeBits<int>((int)REGS[i], 4, name: $"{nameof(REGS)}[{i}]");
+                        REGS[i] = b.SerializeBits<Register>(REGS[i], 4, name: $"{nameof(REGS)}[{i}]");
                 }
                 
                 if (64 - NREG * 4 != 0)
-                    b.SerializeBits<long>(default, 64 - NREG * 4, name: "Padding");
+                    b.SerializePadding(64 - NREG * 4);
             });
         }
 
