@@ -21,11 +21,11 @@ namespace BinarySerializer.PS2
             FLG = ((vifcode.IMMEDIATE >> 14) & 0x01) == 1; // Bit 15
         }
 
-		public override string ToString() {
-			return $"{VN}_{VL}, SIZE: {SIZE}, ADDR: {ADDR}, M: {M}, USN: {USN}, FLG: {FLG}";
-		}
+        public override string ToString() {
+            return $"{VN}_{VL}, SIZE: {SIZE}, ADDR: {ADDR}, M: {M}, USN: {USN}, FLG: {FLG}";
+        }
 
-		public enum UnpackVN
+        public enum UnpackVN
         {
             S,
             V2,
