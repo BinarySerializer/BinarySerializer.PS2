@@ -4,9 +4,9 @@ namespace BinarySerializer.PS2
     {
         public VIFcode_Unpack(VIFcode vifcode)
         {
-            M = (vifcode.CMD >> 3 & 0x01) == 1; // Bit 4
-            VN = (UnpackVN)((vifcode.CMD >> 2) & 0x03); // Bits 2-3
-            VL = (UnpackVL)(vifcode.CMD & 0x03); // Bits 0-1
+            M = ((int)vifcode.CMD >> 3 & 0x01) == 1; // Bit 4
+            VN = (UnpackVN)(((int)vifcode.CMD >> 2) & 0x03); // Bits 2-3
+            VL = (UnpackVL)((int)vifcode.CMD & 0x03); // Bits 0-1
             SIZE = vifcode.NUM;
             ADDR = vifcode.IMMEDIATE & 0x3FF; // Bits 0-9
             USN = ((vifcode.IMMEDIATE >> 13) & 0x01) == 1; // Bit 14
