@@ -8,7 +8,7 @@ namespace BinarySerializer.PS2
 
         public override void SerializeRegisterImpl(SerializerObject s)
         {
-            s.DoBits<ulong>(b =>
+            s.DoBits<long>(b =>
             {
                 XDIR = b.SerializeBits<TransmissionDirection>(XDIR, 11, name: nameof(XDIR));
                 b.SerializePadding(53);

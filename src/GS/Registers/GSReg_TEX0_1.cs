@@ -19,7 +19,7 @@ namespace BinarySerializer.PS2
 
         public override void SerializeRegisterImpl(SerializerObject s)
         {
-            s.DoBits<ulong>(b =>
+            s.DoBits<long>(b =>
             {
                 TPB0 = b.SerializeBits<ushort>(TPB0, 14, name: nameof(TPB0));
                 TBW = b.SerializeBits<byte>(TBW, 6, name: nameof(TBW));

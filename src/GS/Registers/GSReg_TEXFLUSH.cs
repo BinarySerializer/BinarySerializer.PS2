@@ -6,7 +6,7 @@ namespace BinarySerializer.PS2
 
         public override void SerializeRegisterImpl(SerializerObject s)
         {
-            s.DoBits<ulong>(b =>
+            s.DoBits<long>(b =>
             {
                 b.SerializePadding(64);
             });

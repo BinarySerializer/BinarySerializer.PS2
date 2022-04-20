@@ -13,7 +13,7 @@ namespace BinarySerializer.PS2
 
         public override void SerializeRegisterImpl(SerializerObject s)
         {
-            s.DoBits<ulong>(b =>
+            s.DoBits<long>(b =>
             {
                 WMS = b.SerializeBits<WrapMode>(WMS, 2, name: nameof(WMS));
                 WMT = b.SerializeBits<WrapMode>(WMT, 2, name: nameof(WMT));

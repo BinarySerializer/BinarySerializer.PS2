@@ -12,7 +12,7 @@ namespace BinarySerializer.PS2
 
         public override void SerializeImpl(SerializerObject s)
         {
-            s.DoBits<ulong>(b =>
+            s.DoBits<long>(b =>
             {
                 QWC = b.SerializeBits<ushort>(QWC, 16, name: nameof(QWC));
                 b.SerializeBits<int>(default, 10, name: "Padding");

@@ -13,7 +13,7 @@ namespace BinarySerializer.PS2
 
         public override void SerializeImpl(SerializerObject s)
         {
-            s.DoBits<ulong>(b =>
+            s.DoBits<long>(b =>
             {
                 NLOOP = b.SerializeBits<ushort>(NLOOP, 15, name: nameof(NLOOP));
                 EOP = b.SerializeBits<byte>(EOP, 1, name: nameof(EOP));
@@ -23,7 +23,7 @@ namespace BinarySerializer.PS2
                 FLG = b.SerializeBits<DataFormat>(FLG, 2, name: nameof(FLG));
                 NREG = b.SerializeBits<byte>(NREG, 4, name: nameof(NREG));
             });
-            s.DoBits<ulong>(b =>
+            s.DoBits<long>(b =>
             {
                 if (NREG != 0)
                 {

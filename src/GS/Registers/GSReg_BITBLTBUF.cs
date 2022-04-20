@@ -13,7 +13,7 @@ namespace BinarySerializer.PS2
 
         public override void SerializeRegisterImpl(SerializerObject s)
         {
-            s.DoBits<ulong>(b =>
+            s.DoBits<long>(b =>
             {
                 SBP = b.SerializeBits<ushort>(SBP, 14, name: nameof(SBP));
                 b.SerializePadding(2);
