@@ -41,6 +41,7 @@ namespace BinarySerializer.PS2
             MPG = 0x4A,
             DIRECT = 0x50,
             DIRECTHL = 0x51,
+
             UNPACK_S_32 = 0x60,
             UNPACK_S_16 = 0x61,
             UNPACK_S_8 = 0x62,
@@ -53,7 +54,21 @@ namespace BinarySerializer.PS2
             UNPACK_V4_32 = 0x6C,
             UNPACK_V4_16 = 0x6D,
             UNPACK_V4_8 = 0x6E,
-            UNPACK_V4_5 = 0x6F
+            UNPACK_V4_5 = 0x6F,
+
+            UNPACK_S_32_M = 0x70,
+            UNPACK_S_16_M = 0x71,
+            UNPACK_S_8_M = 0x72,
+            UNPACK_V2_32_M = 0x74,
+            UNPACK_V2_16_M = 0x75,
+            UNPACK_V2_8_M = 0x76,
+            UNPACK_V3_32_M = 0x78,
+            UNPACK_V3_16_M = 0x79,
+            UNPACK_V3_8_M = 0x7A,
+            UNPACK_V4_32_M = 0x7C,
+            UNPACK_V4_16_M = 0x7D,
+            UNPACK_V4_8_M = 0x7E,
+            UNPACK_V4_5_M = 0x7F,
         }
 
         public override string ToString() => $"VIFCode(CMD: {CMD}, NUM: {NUM}, IMMEDIATE: {IMMEDIATE}, STALL: {Stall})";
