@@ -7,6 +7,8 @@ namespace BinarySerializer.PS2
         public ushort Height { get; set; }
         public uint FrameCount { get; set; }
         public byte[] FrameData { get; set; }
+        public virtual int FPS => 30;
+        public virtual bool IsAligned => false;
 
         public override void SerializeImpl(SerializerObject s)
         {
