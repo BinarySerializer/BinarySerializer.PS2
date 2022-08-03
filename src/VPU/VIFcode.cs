@@ -8,6 +8,10 @@ namespace BinarySerializer.PS2
         public Command CMD { get; set; }
         public bool Stall { get; set; }
 
+        public bool IsUnpack => (int)CMD >= 0x60 && (int)CMD <= 0x7F;
+        
+        public VIFcode_Unpack GetUnpack() => IsUnpack ? new VIFcode_Unpack(this) : null;
+
         public override void SerializeImpl(SerializerObject s)
         {
             s.DoBits<int>(b =>
