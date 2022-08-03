@@ -3,12 +3,39 @@ namespace BinarySerializer.PS2
     /// <see href="https://psi-rockin.github.io/ps2tek/#giftags">GIFtag documentation</see>
     public class GIFtag : BinarySerializable
     {
+        /// <summary>
+        /// Data per register to transfer
+        /// </summary>
         public ushort NLOOP { get; set; }
-        public byte EOP { get; set; }
-        public byte PRE { get; set; }
-        public ushort PRIM { get; set; }
-        public DataFormat FLG { get; set; }
+
+        /// <summary>
+        /// End of packet
+        /// </summary>
+        public bool EOP { get; set; }
+
+        /// <summary>
+        /// Indicates if <see cref="PRIM"/> is enabled
+        /// </summary>
+        public bool PRE { get; set; }
+
+        /// <summary>
+        /// PRIM, only set if <see cref="PRE"/> is true
+        /// </summary>
+        public PRIM PRIM { get; set; }
+
+        /// <summary>
+        /// The data format
+        /// </summary>
+        public GIF_FLG FLG { get; set; }
+        
+        /// <summary>
+        /// The number of registers
+        /// </summary>
         public byte NREG { get; set; }
+
+        /// <summary>
+        /// The registers
+        /// </summary>
         public Register[] REGS { get; set; }
 
         public override void SerializeImpl(SerializerObject s)
@@ -16,11 +43,23 @@ namespace BinarySerializer.PS2
             s.DoBits<long>(b =>
             {
                 NLOOP = b.SerializeBits<ushort>(NLOOP, 15, name: nameof(NLOOP));
-                EOP = b.SerializeBits<byte>(EOP, 1, name: nameof(EOP));
+                EOP = b.SerializeBits<bool>(EOP, 1, name: nameof(EOP));
                 b.SerializePadding(30);
-                PRE = b.SerializeBits<byte>(PRE, 1, name: nameof(PRE));
-                PRIM = b.SerializeBits<ushort>(PRIM, 11, name: nameof(PRIM));
-                FLG = b.SerializeBits<DataFormat>(FLG, 2, name: nameof(FLG));
+                PRE = b.SerializeBits<bool>(PRE, 1, name: nameof(PRE));
+
+                if (PRE)
+                {
+                    // TODO: Implement support for serializing object using bit-serializer?
+                    PRIM ??= new PRIM();
+                    PRIM.SerializeImpl(b);
+                }
+                else
+                {
+                    // TODO: Is this always padding or should we save the data?
+                    b.SerializePadding(11, logIfNotNull: true);
+                }
+
+                FLG = b.SerializeBits<GIF_FLG>(FLG, 2, name: nameof(FLG));
                 NREG = b.SerializeBits<byte>(NREG, 4, name: nameof(NREG));
             });
             s.DoBits<long>(b =>
@@ -33,36 +72,28 @@ namespace BinarySerializer.PS2
                 }
                 
                 if (64 - NREG * 4 != 0)
-                    b.SerializePadding(64 - NREG * 4);
+                    b.SerializePadding(64 - NREG * 4, logIfNotNull: true);
             });
-        }
-
-        public enum DataFormat
-        {
-            PACKED,
-            REGLIST,
-            IMAGE,
-            DISABLE
         }
 
         public enum Register
         {
-            PRIM,
-            RGBAQ,
-            ST,
-            UV,
-            XYZF2,
-            XYZ2,
-            TEX0_1,
-            TEX0_2,
-            CLAMP_1,
-            CLAMP_2,
-            FOG,
-            RESERVED,
-            XYZF3,
-            XYZ3,
-            AD,
-            NOP
+            PRIM = 0,
+            RGBAQ = 1,
+            ST = 2,
+            UV = 3,
+            XYZF2 = 4,
+            XYZ2 = 5,
+            TEX0_1 = 6,
+            TEX0_2 = 7,
+            CLAMP_1 = 8,
+            CLAMP_2 = 9,
+            FOG = 10,
+            RESERVED = 11,
+            XYZF3 = 12,
+            XYZ3 = 13,
+            AD = 14,
+            NOP = 15,
         }
     }
 }
