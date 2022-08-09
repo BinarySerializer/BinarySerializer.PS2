@@ -29,6 +29,9 @@ namespace BinarySerializer.PS2 {
         public uint ExpectedUnpackDataSize { get; set; }
 
         public uint MemorySize => IsVIF1 ? (uint)0x4000 : 0x1000;
+
+        public List<MemoryStream> Streams { get; set; } = new List<MemoryStream>();
+        public MemoryStream CurrentStream { get; set; }
         public Writer Writer { get; set; }
 
         // Based on https://github.com/PCSX2/pcsx2/blob/943b513a525a819c96ec83ed7a505d95633c2255/pcsx2/Vif_Codes.cpp
@@ -80,6 +83,12 @@ namespace BinarySerializer.PS2 {
         }
 
         public void ExecuteMicroProgram() {
+            if (Writer != null) {
+                Streams.Add(CurrentStream);
+                Writer.Dispose();
+                Writer = null;
+                CurrentStream = null;
+            }
             IsExecutingMicroProgram = true;
             if (IsVIF1) {
                 TOP = TOPS;
@@ -96,7 +105,10 @@ namespace BinarySerializer.PS2 {
         }
 
         public void CreateStream() {
-            MemoryStream ms = new MemoryStream(new byte[MemorySize]);
+            var lastStream = Streams.LastOrDefault();
+            byte[] bytes = (lastStream != null) ? lastStream.ToArray() : new byte[MemorySize];
+            MemoryStream ms = new MemoryStream(bytes);
+            CurrentStream = ms;
             Writer = new Writer(ms, isLittleEndian: true, leaveOpen: true);
         }
 
@@ -134,26 +146,22 @@ namespace BinarySerializer.PS2 {
 
             // Based on https://github.com/PCSX2/pcsx2/blob/943b513a525a819c96ec83ed7a505d95633c2255/pcsx2/x86/newVif_Unpack.cpp#L231
             // Based on https://github.com/PCSX2/pcsx2/blob/943b513a525a819c96ec83ed7a505d95633c2255/pcsx2/Vif_Unpack.cpp#L37
-            if (executeFull) {
-                if (Writer == null) CreateStream();
-            }
             for (int i = 0; i < unpack.SIZE; i++) {
-                if (executeFull) {
-                    Writer.BaseStream.Position = targetAddress;
-                }
+                //if(executeFull)
+                //UnityEngine.Debug.Log($"{i} - TAR:{targetAddress} - SRC:{sourceAddress} - IsFill:{isFill}");
                 // Execute unpack
-                uint curUsedBytes = ExecuteSingleUnpack(command, unpack, executeFull, cl, sourceAddress);
+                uint curUsedBytes = ExecuteSingleUnpack(command, unpack, executeFull, cl, sourceAddress, targetAddress);
                 usedBytes += curUsedBytes;
                 targetAddress += 16;
                 cl++;
                 if (isFill) {
                     if (cl <= CYCLE_CycleLength) {
-                        sourceAddress += CountMaskedBytes ? vSize : usedBytes;
+                        sourceAddress += CountMaskedBytes ? vSize : curUsedBytes;
                     } else if (cl == CYCLE_WriteLength) {
                         cl = 0;
                     }
                 } else {
-                    sourceAddress += CountMaskedBytes ? vSize : usedBytes;
+                    sourceAddress += CountMaskedBytes ? vSize : curUsedBytes;
                     if (cl >= CYCLE_WriteLength) {
                         targetAddress = (uint)(targetAddress + (CYCLE_CycleLength - CYCLE_WriteLength) * 16);
                         cl = 0;
@@ -164,7 +172,7 @@ namespace BinarySerializer.PS2 {
                 ExpectedUnpackDataSize = usedBytes;
         }
 
-        public uint ExecuteSingleUnpack(PS2_VIFCommand command, VIFcode_Unpack unpack, bool executeFull, int cl, uint sourceAddress) {
+        public uint ExecuteSingleUnpack(PS2_VIFCommand command, VIFcode_Unpack unpack, bool executeFull, int cl, uint sourceAddress, uint targetAddress) {
             uint count = unpack.VN switch {
                 VIFcode_Unpack.UnpackVN.S => 1,
                 VIFcode_Unpack.UnpackVN.V2 => 2,
@@ -188,8 +196,9 @@ namespace BinarySerializer.PS2 {
                     currentSourceAddress += size;
                 } else if (unpack.VN == VIFcode_Unpack.UnpackVN.V3 || unpack.VN == VIFcode_Unpack.UnpackVN.V4) {
                     currentSourceAddress += i * size;
+                    if(unpack.VN == VIFcode_Unpack.UnpackVN.V3 && i == 3) currentSourceAddress -= size;
                 }
-                if (WriteXYZW(command, unpack, executeFull, cl, mode, size, i, currentSourceAddress)) {
+                if (WriteXYZW(command, unpack, executeFull, cl, mode, size, i, currentSourceAddress, targetAddress + i * 4)) {
                     switch (unpack.VN) {
                         case VIFcode_Unpack.UnpackVN.S:
                             useData[0] = true;
@@ -206,25 +215,60 @@ namespace BinarySerializer.PS2 {
                     }
                 }
             }
-            return (uint)useData.Where(u => u == true).Count();
+            return (uint)useData.Where(u => u == true).Count() * size;
         }
-        public bool WriteXYZW(PS2_VIFCommand command, VIFcode_Unpack unpack, bool executeFull, int cl, uint mode, uint size, uint offnum, uint sourceAddress) {
+        private uint SetVifRow(uint index, uint data) {
+            if(ROW == null) ROW = new uint[4];
+            ROW[index] = data;
+            return data;
+        }
+        private uint GetVifRow(uint index) => (ROW?[index] ?? 0);
+
+        public bool WriteXYZW(PS2_VIFCommand command, VIFcode_Unpack unpack, bool executeFull, int cl, uint mode, uint sourceDataSize, uint offnum, uint sourceAddress, uint targetAddress) {
             bool doMask = unpack.M;
             int maskMode = 0;
+            var col = Math.Min(cl, 3);
             if (doMask) {
-                maskMode = (int)BitHelpers.ExtractBits64(MASK, 2, Math.Min(cl, 3) * 8 + (int)offnum * 2);
+                maskMode = (int)BitHelpers.ExtractBits64(MASK, 2, col * 8 + (int)offnum * 2);
             }
             bool useData = maskMode == 0;
-            switch (maskMode) {
-                case 0: // 0 - Data
-                    break;
-                case 1: // 1 - MaskRow
-                    break;
-                case 2: // 2 - MaskCol
-                    break;
-                case 3: // 3 - Write protect
-                    // Do nothing
-                    break;
+            if (executeFull) {
+                 if (Writer == null) CreateStream();
+                Writer.BaseStream.Position = targetAddress;
+                switch (maskMode) {
+                    case 0: // 0 - Data
+                        byte[] dataBytes = new byte[4];
+                        //UnityEngine.Debug.Log($"{command.UnpackData.Length} - {sourceAddress} - {sourceDataSize}");
+                        Array.Copy(
+                            command.UnpackData, sourceAddress,
+                            dataBytes, 0,
+                            sourceDataSize);
+                        if (sourceDataSize < 4 && !unpack.USN) {
+                            // Sign extension
+                            byte lastByte = dataBytes[sourceDataSize-1];
+                            bool hasSign = BitHelpers.ExtractBits(lastByte, 1, 7) == 1;
+                            if (hasSign) {
+                                for (int i = (int)sourceDataSize; i < 4; i++) dataBytes[i] = 0xFF;
+                            }
+                        }
+                        uint dataUInt = BitConverter.ToUInt32(dataBytes, 0);
+                        switch (mode) {
+                            case 1: Writer.Write(dataUInt + GetVifRow(offnum)); break;
+                            case 2: Writer.Write(SetVifRow(offnum, dataUInt + GetVifRow(offnum))); break;
+                            case 3: Writer.Write(SetVifRow(offnum, dataUInt)); break;
+                            default: Writer.Write(dataUInt); break;
+                        }
+                        break;
+                    case 1: // 1 - MaskRow
+                        Writer.Write(GetVifRow(offnum));
+                        break;
+                    case 2: // 2 - MaskCol
+                        Writer.Write(COL?[col] ?? 0);
+                        break;
+                    case 3: // 3 - Write protect
+                            // Do nothing
+                        break;
+                }
             }
             return useData;
         }
