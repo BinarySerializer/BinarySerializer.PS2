@@ -64,15 +64,15 @@ namespace BinarySerializer.PS2
             });
             s.DoBits<long>(b =>
             {
-                if (NREG != 0)
-                {
-                    REGS = new Register[NREG];
-                    for (int i = 0; i < NREG; i++)
-                        REGS[i] = b.SerializeBits<Register>(REGS[i], 4, name: $"{nameof(REGS)}[{i}]");
-                }
-                
-                if (64 - NREG * 4 != 0)
-                    b.SerializePadding(64 - NREG * 4, logIfNotNull: true);
+                // If it's 0 then there are 16 registers defined
+                int regCount = NREG == 0 ? 16 : NREG;
+
+                REGS = new Register[regCount];
+                for (int i = 0; i < regCount; i++)
+                    REGS[i] = b.SerializeBits<Register>(REGS[i], 4, name: $"{nameof(REGS)}[{i}]");
+
+                if (64 - regCount * 4 != 0)
+                    b.SerializePadding(64 - regCount * 4, logIfNotNull: true);
             });
         }
 
