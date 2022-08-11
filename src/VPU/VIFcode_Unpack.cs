@@ -19,6 +19,8 @@ namespace BinarySerializer.PS2
         public uint SIZE { get; set; }
         public uint ADDR { get; set; }
 
+        public uint Count => SIZE != 0 ? SIZE : 256;
+
         /// <summary>
         /// False if it's sign-extended. For example if a 16-bit value is unpacked then the remaining
         /// 16 bits get set so the full 32-bit value remains signed.

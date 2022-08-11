@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 
 namespace BinarySerializer.PS2 {
-    public class PS2_VIFParser
+    public class VIF_Parser
     {
         // Settings
         public bool IsVIF1 { get; set; } = false;
@@ -18,10 +18,10 @@ namespace BinarySerializer.PS2 {
         public uint TOP { get; set; }
         public uint BASE { get; set; }
         public uint OFST { get; set; }
-        public byte CYCLE_CycleLength { get; set; } // CL
-        public byte CYCLE_WriteLength { get; set; } // WL
-        public uint[] ROW { get; set; }
-        public uint[] COL { get; set; }
+        public byte CYCLE_CycleLength { get; set; } = 1; // CL
+        public byte CYCLE_WriteLength { get; set; } = 1; // WL
+        public uint[] ROW { get; set; } = new uint[4];
+        public uint[] COL { get; set; } = new uint[4];
         public uint MASK { get; set; }
 
         public bool IsExecutingMicroProgram { get; set; } = false;
@@ -34,9 +34,19 @@ namespace BinarySerializer.PS2 {
         public MemoryStream CurrentStream { get; set; }
         public Writer Writer { get; set; }
 
+        public bool StartsNewMicroProgram(VIF_Command command) {
+            switch (command.VIFCode.CMD) {
+                case VIFcode.Command.MSCAL:
+                case VIFcode.Command.MSCALF:
+                case VIFcode.Command.MSCNT:
+                    return true;
+                default: return false;
+            }
+        }
+
         // Based on https://github.com/PCSX2/pcsx2/blob/943b513a525a819c96ec83ed7a505d95633c2255/pcsx2/Vif_Codes.cpp
         // Based on https://psi-rockin.github.io/ps2tek/#vifcommands
-        public void ExecuteCommand(PS2_VIFCommand command, bool executeFull) {
+        public void ExecuteCommand(VIF_Command command, bool executeFull) {
             if (command.VIFCode.IsUnpack) {
                 ExecuteUnpackCommand(command, executeFull);
                 return;
@@ -62,10 +72,10 @@ namespace BinarySerializer.PS2 {
                     CYCLE_WriteLength = (byte)BitHelpers.ExtractBits64(command.VIFCode.IMMEDIATE, 8, 8);
                     break;
                 case VIFcode.Command.STROW:
-                    ROW = command.ROW;
+                    Array.Copy(command.ROW, ROW, 4);
                     break;
                 case VIFcode.Command.STCOL:
-                    COL = command.COL;
+                    Array.Copy(command.COL, COL, 4);
                     break;
                 case VIFcode.Command.STMASK:
                     MASK = command.MASK;
@@ -112,7 +122,9 @@ namespace BinarySerializer.PS2 {
             Writer = new Writer(ms, isLittleEndian: true, leaveOpen: true);
         }
 
-        public void ExecuteUnpackCommand(PS2_VIFCommand command, bool executeFull) {
+        private int CurCL { get; set; } = 0;
+
+        public void ExecuteUnpackCommand(VIF_Command command, bool executeFull) {
             VIFcode_Unpack unpack = command.VIFCode.GetUnpack();
 
             uint wl = CYCLE_WriteLength != 0 ? (uint)CYCLE_WriteLength : 256;
@@ -122,7 +134,9 @@ namespace BinarySerializer.PS2 {
             uint targetAddress = unpack.ADDR;
             if (IsVIF1 && unpack.FLG) targetAddress += TOPS;
             targetAddress = (uint)((targetAddress << 4) & (IsVIF1 ? 0x3ff0 : 0xff0));
-            var cl = 0;
+
+            CurCL = 0;
+            var cl = CurCL;
 
             bool doMask = unpack.M;
 
@@ -141,12 +155,12 @@ namespace BinarySerializer.PS2 {
             };
             uint vSize = size * count;
 
-            ExpectedUnpackDataSize = unpack.SIZE * vSize;
+            ExpectedUnpackDataSize = unpack.Count * vSize;
             uint usedBytes = 0;
 
             // Based on https://github.com/PCSX2/pcsx2/blob/943b513a525a819c96ec83ed7a505d95633c2255/pcsx2/x86/newVif_Unpack.cpp#L231
             // Based on https://github.com/PCSX2/pcsx2/blob/943b513a525a819c96ec83ed7a505d95633c2255/pcsx2/Vif_Unpack.cpp#L37
-            for (int i = 0; i < unpack.SIZE; i++) {
+            for (int i = 0; i < unpack.Count; i++) {
                 //if(executeFull)
                 //UnityEngine.Debug.Log($"{i} - TAR:{targetAddress} - SRC:{sourceAddress} - IsFill:{isFill}");
                 // Execute unpack
@@ -168,19 +182,20 @@ namespace BinarySerializer.PS2 {
                     }
                 }
             }
+            CurCL = cl;
             if(doMask)
                 ExpectedUnpackDataSize = usedBytes;
         }
 
-        public uint ExecuteSingleUnpack(PS2_VIFCommand command, VIFcode_Unpack unpack, bool executeFull, int cl, uint sourceAddress, uint targetAddress) {
-            uint count = unpack.VN switch {
+        public uint ExecuteSingleUnpack(VIF_Command command, VIFcode_Unpack unpack, bool executeFull, int cl, uint sourceAddress, uint targetAddress) {
+            uint sourceDataCount = unpack.VN switch {
                 VIFcode_Unpack.UnpackVN.S => 1,
                 VIFcode_Unpack.UnpackVN.V2 => 2,
                 VIFcode_Unpack.UnpackVN.V3 => 3,
                 VIFcode_Unpack.UnpackVN.V4 => 4,
                 _ => throw new Exception($"Unknown VIF Unpack command for data type {unpack.VN}-{unpack.VL}")
             };
-            uint size = unpack.VL switch {
+            uint sourceDataSize = unpack.VL switch {
                 VIFcode_Unpack.UnpackVL.VL_8 => 1,
                 VIFcode_Unpack.UnpackVL.VL_16 => 2,
                 VIFcode_Unpack.UnpackVL.VL_32 => 4,
@@ -192,13 +207,14 @@ namespace BinarySerializer.PS2 {
 
             for (uint i = 0; i < 4; i++) {
                 uint currentSourceAddress = sourceAddress;
-                if (unpack.VN == VIFcode_Unpack.UnpackVN.V2 && i % 2 == 1) {
-                    currentSourceAddress += size;
+                currentSourceAddress += (i % sourceDataCount) * sourceDataSize;
+                /*if (unpack.VN == VIFcode_Unpack.UnpackVN.V2 && i % 2 == 1) {
+                    currentSourceAddress += sourceDataSize;
                 } else if (unpack.VN == VIFcode_Unpack.UnpackVN.V3 || unpack.VN == VIFcode_Unpack.UnpackVN.V4) {
-                    currentSourceAddress += i * size;
-                    if(unpack.VN == VIFcode_Unpack.UnpackVN.V3 && i == 3) currentSourceAddress -= size;
-                }
-                if (WriteXYZW(command, unpack, executeFull, cl, mode, size, i, currentSourceAddress, targetAddress + i * 4)) {
+                    currentSourceAddress += i * sourceDataSize;
+                    if(unpack.VN == VIFcode_Unpack.UnpackVN.V3 && i == 3) currentSourceAddress -= sourceDataSize;
+                }*/
+                if (WriteXYZW(command, unpack, executeFull, cl, mode, sourceDataSize, i, currentSourceAddress, targetAddress + i * 4)) {
                     switch (unpack.VN) {
                         case VIFcode_Unpack.UnpackVN.S:
                             useData[0] = true;
@@ -215,16 +231,14 @@ namespace BinarySerializer.PS2 {
                     }
                 }
             }
-            return (uint)useData.Where(u => u == true).Count() * size;
+            return (uint)useData.Where(u => u == true).Count() * sourceDataSize;
         }
         private uint SetVifRow(uint index, uint data) {
-            if(ROW == null) ROW = new uint[4];
             ROW[index] = data;
             return data;
         }
-        private uint GetVifRow(uint index) => (ROW?[index] ?? 0);
 
-        public bool WriteXYZW(PS2_VIFCommand command, VIFcode_Unpack unpack, bool executeFull, int cl, uint mode, uint sourceDataSize, uint offnum, uint sourceAddress, uint targetAddress) {
+        public bool WriteXYZW(VIF_Command command, VIFcode_Unpack unpack, bool executeFull, int cl, uint mode, uint sourceDataSize, uint offnum, uint sourceAddress, uint targetAddress) {
             bool doMask = unpack.M;
             int maskMode = 0;
             var col = Math.Min(cl, 3);
@@ -253,17 +267,25 @@ namespace BinarySerializer.PS2 {
                         }
                         uint dataUInt = BitConverter.ToUInt32(dataBytes, 0);
                         switch (mode) {
-                            case 1: Writer.Write(dataUInt + GetVifRow(offnum)); break;
-                            case 2: Writer.Write(SetVifRow(offnum, dataUInt + GetVifRow(offnum))); break;
-                            case 3: Writer.Write(SetVifRow(offnum, dataUInt)); break;
-                            default: Writer.Write(dataUInt); break;
+                            case 1: // Add
+                                Writer.Write(dataUInt + ROW[offnum]);
+                                break;
+                            case 2: // AddRow
+                                Writer.Write(SetVifRow(offnum, dataUInt + ROW[offnum]));
+                                break;
+                            case 3: // Row
+                                Writer.Write(SetVifRow(offnum, dataUInt));
+                                break;
+                            default: // Direct (0)
+                                Writer.Write(dataUInt);
+                                break;
                         }
                         break;
                     case 1: // 1 - MaskRow
-                        Writer.Write(GetVifRow(offnum));
+                        Writer.Write(ROW[offnum]);
                         break;
                     case 2: // 2 - MaskCol
-                        Writer.Write(COL?[col] ?? 0);
+                        Writer.Write(COL[col]);
                         break;
                     case 3: // 3 - Write protect
                             // Do nothing

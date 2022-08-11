@@ -1,6 +1,6 @@
 ﻿namespace BinarySerializer.PS2
 {
-    public class PS2_VIFCommand : BinarySerializable
+    public class VIF_Command : BinarySerializable
     {
         public VIFcode VIFCode { get; set; }
 
@@ -10,7 +10,7 @@
 
         public byte[] UnpackData { get; set; }
 
-        public PS2_VIFParser Pre_Parser { get; set; }
+        public VIF_Parser Pre_Parser { get; set; }
 
         public override void SerializeImpl(SerializerObject s)
         {
