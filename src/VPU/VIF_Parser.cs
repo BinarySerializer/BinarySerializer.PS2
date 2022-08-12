@@ -30,7 +30,6 @@ namespace BinarySerializer.PS2 {
 
         public uint MemorySize => IsVIF1 ? (uint)0x4000 : 0x1000;
 
-        public List<MemoryStream> Streams { get; set; } = new List<MemoryStream>();
         public MemoryStream CurrentStream { get; set; }
         public Writer Writer { get; set; }
 
@@ -93,12 +92,6 @@ namespace BinarySerializer.PS2 {
         }
 
         public void ExecuteMicroProgram() {
-            if (Writer != null) {
-                Streams.Add(CurrentStream);
-                Writer.Dispose();
-                Writer = null;
-                CurrentStream = null;
-            }
             IsExecutingMicroProgram = true;
             if (IsVIF1) {
                 TOP = TOPS;
@@ -115,11 +108,9 @@ namespace BinarySerializer.PS2 {
         }
 
         public void CreateStream() {
-            var lastStream = Streams.LastOrDefault();
-            byte[] bytes = (lastStream != null) ? lastStream.ToArray() : new byte[MemorySize];
-            MemoryStream ms = new MemoryStream(bytes);
-            CurrentStream = ms;
-            Writer = new Writer(ms, isLittleEndian: true, leaveOpen: true);
+            byte[] bytes =new byte[MemorySize];
+            CurrentStream = new MemoryStream(bytes);
+            Writer = new Writer(CurrentStream, isLittleEndian: true, leaveOpen: true);
         }
 
         private int CurCL { get; set; } = 0;
