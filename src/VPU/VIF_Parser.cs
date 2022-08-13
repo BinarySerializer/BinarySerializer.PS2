@@ -28,6 +28,7 @@ namespace BinarySerializer.PS2
         public uint MASK { get; set; }
 
         public bool IsExecutingMicroProgram { get; set; } = false;
+        public bool HasPendingChanges { get; set; } = false;
 
         public uint ExpectedUnpackDataSize { get; set; }
 
@@ -96,6 +97,7 @@ namespace BinarySerializer.PS2
 
         public void ExecuteMicroProgram() {
             IsExecutingMicroProgram = true;
+            HasPendingChanges = false;
             if (IsVIF1) {
                 TOP = TOPS;
                 if (DBF) {
@@ -240,6 +242,7 @@ namespace BinarySerializer.PS2
                 maskMode = (int)BitHelpers.ExtractBits64(MASK, 2, col * 8 + (int)offnum * 2);
             }
             bool useData = maskMode == 0;
+            HasPendingChanges = true;
             if (executeFull) {
                  if (Writer == null) CreateStream();
                 Writer.BaseStream.Position = targetAddress;
