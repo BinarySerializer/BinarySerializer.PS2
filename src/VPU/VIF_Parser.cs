@@ -1,11 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace BinarySerializer.PS2 {
+namespace BinarySerializer.PS2
+{
     public class VIF_Parser
     {
+        protected MemoryStream CurrentStream { get; set; }
+        protected Writer Writer { get; set; }
+
         // Settings
         public bool IsVIF1 { get; set; } = false;
         public bool CountMaskedBytes { get; set; } = false;
@@ -28,10 +31,9 @@ namespace BinarySerializer.PS2 {
 
         public uint ExpectedUnpackDataSize { get; set; }
 
-        public uint MemorySize => IsVIF1 ? (uint)0x4000 : 0x1000;
+        public int MemorySize => IsVIF1 ? 0x4000 : 0x1000;
 
-        public MemoryStream CurrentStream { get; set; }
-        public Writer Writer { get; set; }
+        public byte[] GetCurrentBuffer() => CurrentStream?.GetBuffer();
 
         public bool StartsNewMicroProgram(VIF_Command command) {
             switch (command.VIFCode.CMD) {
@@ -39,7 +41,8 @@ namespace BinarySerializer.PS2 {
                 case VIFcode.Command.MSCALF:
                 case VIFcode.Command.MSCNT:
                     return true;
-                default: return false;
+                default: 
+                    return false;
             }
         }
 
@@ -107,9 +110,9 @@ namespace BinarySerializer.PS2 {
             }
         }
 
-        public void CreateStream() {
-            byte[] bytes =new byte[MemorySize];
-            CurrentStream = new MemoryStream(bytes);
+        public void CreateStream() 
+        {
+            CurrentStream = new MemoryStream(MemorySize);
             Writer = new Writer(CurrentStream, isLittleEndian: true, leaveOpen: true);
         }
 
@@ -222,7 +225,7 @@ namespace BinarySerializer.PS2 {
                     }
                 }
             }
-            return (uint)useData.Where(u => u == true).Count() * sourceDataSize;
+            return (uint)useData.Count(u => u) * sourceDataSize;
         }
         private uint SetVifRow(uint index, uint data) {
             ROW[index] = data;
