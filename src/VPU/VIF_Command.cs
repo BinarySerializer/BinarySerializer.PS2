@@ -2,6 +2,8 @@
 {
     public class VIF_Command : BinarySerializable
     {
+        public VIF_Parser Pre_Parser { get; set; }
+
         public VIFcode VIFCode { get; set; }
 
         public uint[] ROW { get; set; }
@@ -10,10 +12,11 @@
 
         public byte[] UnpackData { get; set; }
 
-        public VIF_Parser Pre_Parser { get; set; }
-
         public override void SerializeImpl(SerializerObject s)
         {
+            if (Pre_Parser == null)
+                throw new MissingPreValueException(this, nameof(Pre_Parser));
+
             VIFCode = s.SerializeObject<VIFcode>(VIFCode, name: nameof(VIFCode));
 
             if (VIFCode.IsUnpack)
