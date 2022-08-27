@@ -25,13 +25,13 @@
 
         public override void SerializeImpl(SerializerObject s) {
             R = s.Serialize<byte>(R, name: nameof(R));
-            s.Align(4, Offset);
+            s.SerializePadding(3);
             G = s.Serialize<byte>(G, name: nameof(G));
-            s.Align(4, Offset);
+            s.SerializePadding(3);
             B = s.Serialize<byte>(B, name: nameof(B));
-            s.Align(4, Offset);
+            s.SerializePadding(3);
             A = s.Serialize<byte>(A, name: nameof(A));
-            s.Align(4, Offset);
+            s.SerializePadding(3);
         }
     }
 }
