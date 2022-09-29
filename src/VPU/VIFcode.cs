@@ -1,7 +1,7 @@
 namespace BinarySerializer.PS2
 {
     /// <see href="https://psi-rockin.github.io/ps2tek/#vifcommands">VIFcode documentation</see>
-    public class VIFcode : BinarySerializable
+    public class VIFcode : BinarySerializable, ISerializerShortLog
     {
         public uint IMMEDIATE { get; set; }
         public uint NUM { get; set; }
@@ -76,6 +76,6 @@ namespace BinarySerializer.PS2
         }
 
         public override string ToString() => $"VIFCode(CMD: {CMD}, NUM: {NUM}, IMMEDIATE: {IMMEDIATE}, STALL: {Stall})";
-        public override bool UseShortLog => true;
+        public string ShortLog => ToString();
     }
 }

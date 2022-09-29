@@ -1,7 +1,7 @@
 namespace BinarySerializer.PS2
 {
     /// <see href="https://psi-rockin.github.io/ps2tek/#dmacchainmode">DMAtag documentation</see>
-    public class Chain_DMAtag : BinarySerializable
+    public class Chain_DMAtag : BinarySerializable, ISerializerShortLog
     {
         public ushort QWC { get; set; }
         public byte PCE { get; set; }
@@ -37,6 +37,6 @@ namespace BinarySerializer.PS2
         }
 
         public override string ToString() => $"DMATag(TagID: {ID}, QWC: {QWC}, ADDR: {ADDR:X8}, SPR: {SPR}, PCE: {PCE}, IRQ: {IRQ})";
-        public override bool UseShortLog => true;
+        public string ShortLog => ToString();
     }
 }
