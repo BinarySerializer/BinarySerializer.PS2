@@ -89,6 +89,11 @@ namespace BinarySerializer.PS2
                     ExecuteMicroProgram();
                     break;
                 case VIFcode.Command.NOP:
+                case VIFcode.Command.FLUSHE:
+                case VIFcode.Command.FLUSH:
+                case VIFcode.Command.FLUSHA:
+                case VIFcode.Command.DIRECT:
+                case VIFcode.Command.DIRECTHL:
                     break;
                 default:
                     throw new Exception($"Unparsed VIF command {command.VIFCode.CMD}");

@@ -10,6 +10,7 @@
         public uint[] COL { get; set; }
         public uint MASK { get; set; }
 
+        public byte[] DirectData { get; set; }
         public byte[] UnpackData { get; set; }
 
         public override void SerializeImpl(SerializerObject s)
@@ -37,9 +38,12 @@
                 switch (VIFCode.CMD)
                 {
                     case VIFcode.Command.NOP:
-                    case VIFcode.Command.BASE:
                     case VIFcode.Command.OFFSET:
+                    case VIFcode.Command.BASE:
                     case VIFcode.Command.STMOD:
+                    case VIFcode.Command.FLUSHE:
+                    case VIFcode.Command.FLUSH:
+                    case VIFcode.Command.FLUSHA:
                     case VIFcode.Command.MSCAL:
                     case VIFcode.Command.MSCALF:
                     case VIFcode.Command.MSCNT: // Transfer data
@@ -56,6 +60,12 @@
 
                     case VIFcode.Command.STMASK:
                         MASK = s.Serialize<uint>(MASK, name: nameof(MASK));
+                        break;
+                    
+                    // Transfers IMMEDIATE quadwords to GIF
+                    case VIFcode.Command.DIRECT:
+                    case VIFcode.Command.DIRECTHL:
+                        DirectData = s.SerializeArray<byte>(DirectData, VIFCode.IMMEDIATE * 16, name: nameof(DirectData));
                         break;
 
                     default:
